@@ -1,0 +1,65 @@
+@import "react-day-picker/dist/style.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 33% 98%;
+  --foreground: 222.2 47.4% 11.2%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 47.4% 11.2%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+  --primary: 214 86% 46%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 207 91% 95%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 214 86% 46%;
+  --weekend: 0 100% 97%;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: 222 30% 10%;
+  --foreground: 210 25% 92%;
+  --card: 222 24% 14%;
+  --card-foreground: 210 25% 92%;
+  --popover: 222 24% 14%;
+  --popover-foreground: 210 25% 92%;
+  --primary: 214 75% 58%;
+  --primary-foreground: 220 35% 96%;
+  --secondary: 222 19% 19%;
+  --secondary-foreground: 210 25% 92%;
+  --muted: 222 19% 19%;
+  --muted-foreground: 215 14% 68%;
+  --accent: 222 19% 22%;
+  --accent-foreground: 210 25% 92%;
+  --destructive: 0 68% 52%;
+  --destructive-foreground: 210 25% 92%;
+  --border: 222 16% 26%;
+  --input: 222 16% 26%;
+  --ring: 214 75% 58%;
+  --weekend: 220 23% 18%;
+}
+
+* {
+  @apply border-border;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+}
