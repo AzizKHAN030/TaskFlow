@@ -262,6 +262,21 @@ export function CalendarBoard({
   const todayDay = days.find((day) => day.isToday);
 
   useEffect(() => {
+    setTasks(initialTasks);
+    setDialog((state) =>
+      state.open
+        ? state
+        : {
+            ...state,
+            initial: {
+              ...state.initial,
+              taskDate: days[0]?.key ?? ""
+            }
+          }
+    );
+  }, [initialTasks, days]);
+
+  useEffect(() => {
     if (mode !== "month" || !todayDay) {
       return;
     }
@@ -281,11 +296,21 @@ export function CalendarBoard({
   const handleDuplicate = (task: CalendarTask) => {
     startTransition(async () => {
       try {
-        await duplicateTask({
+        const clone = await duplicateTask({
           id: task.id,
           projectId,
           taskDate: task.taskDate
         });
+        setTasks((current) => [
+          ...current,
+          {
+            id: clone.id,
+            title: clone.title,
+            description: clone.description,
+            taskDate: clone.taskDate.toISOString().slice(0, 10),
+            sortOrder: clone.sortOrder
+          }
+        ]);
         toast.success("Task duplicated");
         refresh();
       } catch (error) {
