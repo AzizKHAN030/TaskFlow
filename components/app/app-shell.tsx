@@ -1,6 +1,7 @@
 import { CheckSquare } from "lucide-react";
 import { LogoutButton } from "@/components/app/logout-button";
 import { SidebarNav } from "@/components/app/sidebar-nav";
+import { ExportReminderBanner } from "@/components/app/export-reminder-banner";
 
 export function AppShell({
   children,
@@ -49,7 +50,10 @@ export function AppShell({
             </div>
           </div>
         </header>
-        <main className="flex-1 p-4 lg:p-8">{children}</main>
+        <main className="flex-1 p-4 lg:p-8">
+          <ExportReminderBanner />
+          {children}
+        </main>
       </div>
     </div>
   );
