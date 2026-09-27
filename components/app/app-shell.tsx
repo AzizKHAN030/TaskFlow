@@ -1,13 +1,16 @@
 import { CheckSquare } from "lucide-react";
+import Link from "next/link";
 import { LogoutButton } from "@/components/app/logout-button";
 import { SidebarNav } from "@/components/app/sidebar-nav";
 import { ExportReminderBanner } from "@/components/app/export-reminder-banner";
 
 export function AppShell({
   children,
-  user
+  user,
+  defaultProjectId
 }: {
   children: React.ReactNode;
+  defaultProjectId: string | null;
   user: {
     id: string;
     name?: string | null;
@@ -30,7 +33,7 @@ export function AppShell({
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-            <SidebarNav />
+            <SidebarNav defaultProjectId={defaultProjectId} />
           </div>
 
           <div className="mt-4 rounded-lg border bg-slate-50 dark:bg-slate-800/70 p-3">
@@ -45,7 +48,8 @@ export function AppShell({
         <header className="sticky top-0 z-10 border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur">
           <div className="flex h-14 items-center justify-between px-4 lg:px-8">
             <p className="text-sm font-semibold">TaskFlow Dashboard</p>
-            <div className="lg:hidden">
+            <div className="flex items-center gap-4 lg:hidden">
+              <Link href="/invoices" className="text-sm font-medium">Invoices</Link>
               <LogoutButton />
             </div>
           </div>

@@ -13,11 +13,13 @@ const tabs = [
 export function ProjectTabsNav({
   projectId,
   projectName,
-  active
+  active,
+  week
 }: {
   projectId: string;
   projectName: string;
   active: "week" | "month" | "export";
+  week?: string;
 }) {
   return (
     <div className="rounded-xl border bg-card p-3 shadow-sm">
@@ -50,6 +52,7 @@ export function ProjectTabsNav({
           <ExportActions
             projectId={projectId}
             defaultType={active === "month" ? "monthly" : "weekly"}
+            week={week}
             active={active === "export"}
             variant="tabs"
           />

@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import {
   createProjectSchema,
   deleteProjectSchema,
+  setDefaultProjectSchema,
   updateProjectSchema
 } from "@/lib/validators/project";
 
@@ -87,6 +88,24 @@ export async function deleteProject(input: { id: string }) {
 
   await prisma.project.delete({ where: { id: parsed.id } });
 
-  revalidatePath("/projects");
+  // Deleting the default project clears its foreign key; refresh the sidebar too.
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+export async function setDefaultProject(input: { id: string }) {
+  const user = await requireUser();
+  const { id } = setDefaultProjectSchema.parse(input);
+  const project = await prisma.project.findFirst({
+    where: { id, ownerId: user.id },
+    select: { id: true }
+  });
+  if (!project) throw new Error("Project not found");
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { defaultProjectId: project.id }
+  });
+  revalidatePath("/", "layout");
   return { success: true };
 }

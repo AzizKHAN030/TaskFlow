@@ -3,9 +3,9 @@
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Edit2, FolderKanban, Plus, Trash2 } from "lucide-react";
+import { Edit2, FolderKanban, Plus, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { createProject, deleteProject, updateProject } from "@/lib/actions/project-actions";
+import { createProject, deleteProject, setDefaultProject, updateProject } from "@/lib/actions/project-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -90,7 +90,10 @@ function ProjectForm({
   );
 }
 
-export function ProjectsClient({ initialProjects }: { initialProjects: ProjectRow[] }) {
+export function ProjectsClient({ initialProjects, defaultProjectId }: {
+  initialProjects: ProjectRow[];
+  defaultProjectId: string | null;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [createOpen, setCreateOpen] = useState(false);
@@ -154,6 +157,28 @@ export function ProjectsClient({ initialProjects }: { initialProjects: ProjectRo
                 <p className="line-clamp-2 text-sm text-muted-foreground">{project.description || "No description"}</p>
               </CardHeader>
               <CardContent>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mb-3"
+                  disabled={pending || project.id === defaultProjectId}
+                  aria-pressed={project.id === defaultProjectId}
+                  aria-label={project.id === defaultProjectId ? `${project.name} is the default project` : `Set ${project.name} as default`}
+                  onClick={() => {
+                    startTransition(async () => {
+                      try {
+                        await setDefaultProject({ id: project.id });
+                        toast.success(`${project.name} set as default`);
+                        router.refresh();
+                      } catch (error) {
+                        toast.error(error instanceof Error ? error.message : "Failed to set default project");
+                      }
+                    });
+                  }}
+                >
+                  <Star className={`mr-2 h-4 w-4${project.id === defaultProjectId ? " fill-current" : ""}`} />
+                  {project.id === defaultProjectId ? "Default project" : "Set as default"}
+                </Button>
                 <div className="flex items-center justify-between gap-2">
                   <Button asChild className="flex-1">
                     <Link href={`/projects/${project.id}/week`}>Open</Link>

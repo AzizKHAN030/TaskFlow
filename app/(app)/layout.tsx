@@ -18,7 +18,8 @@ export default async function AppLayout({
   const dbUser = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
-      themePreference: true
+      themePreference: true,
+      defaultProject: { select: { id: true, ownerId: true } }
     }
   });
 
@@ -27,7 +28,10 @@ export default async function AppLayout({
   return (
     <>
       {preference ? <ThemePreferenceSync preference={preference} /> : null}
-      <AppShell user={session.user}>{children}</AppShell>
+      <AppShell
+        user={session.user}
+        defaultProjectId={dbUser?.defaultProject?.ownerId === session.user.id ? dbUser.defaultProject.id : null}
+      >{children}</AppShell>
     </>
   );
 }

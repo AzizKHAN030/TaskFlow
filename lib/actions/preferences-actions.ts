@@ -45,9 +45,7 @@ export async function updateUserPreferences(input: {
     }
   });
 
-  revalidatePath("/settings");
-  revalidatePath("/dashboard");
-  revalidatePath("/projects");
+  revalidatePath("/", "layout");
 
   return { success: true };
 }

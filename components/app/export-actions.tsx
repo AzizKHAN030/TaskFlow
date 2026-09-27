@@ -49,11 +49,13 @@ function getFilenameFromContentDisposition(header: string | null) {
 export function ExportActions({
   projectId,
   defaultType,
+  week,
   active = false,
   variant = "tabs"
 }: {
   projectId?: string | null;
   defaultType: ExportType;
+  week?: string;
   active?: boolean;
   variant?: "tabs" | "sidebar";
 }) {
@@ -112,6 +114,7 @@ export function ExportActions({
   };
 
   const base = projectId ? `/api/projects/${projectId}/export` : "";
+  const weeklyUrl = `${base}?type=weekly${week ? `&week=${encodeURIComponent(week)}` : ""}`;
 
   return (
     <>
@@ -122,7 +125,7 @@ export function ExportActions({
           className={cn(classes.main, variant === "sidebar" && "px-3 py-2 text-sm")}
           disabled={disabled}
           onClick={() => {
-            void download(`${base}?type=${defaultType}`);
+            void download(defaultType === "weekly" ? weeklyUrl : `${base}?type=monthly`);
           }}
         >
           <Download className="mr-2 h-4 w-4" />
@@ -147,7 +150,7 @@ export function ExportActions({
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => {
-                void download(`${base}?type=weekly`);
+                void download(weeklyUrl);
               }}
             >
               Export Weekly

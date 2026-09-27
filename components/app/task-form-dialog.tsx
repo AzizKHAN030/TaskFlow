@@ -59,6 +59,12 @@ export function TaskFormDialog({
 
         <form
           className="space-y-4"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && e.metaKey && !pending) {
+              e.preventDefault();
+              e.currentTarget.requestSubmit();
+            }
+          }}
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit({

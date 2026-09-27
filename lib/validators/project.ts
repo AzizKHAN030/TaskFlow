@@ -12,3 +12,7 @@ export const updateProjectSchema = createProjectSchema.extend({
 export const deleteProjectSchema = z.object({
   id: z.string().cuid()
 });
+
+export const setDefaultProjectSchema = z.object({
+  id: z.string().cuid()
+});

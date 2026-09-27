@@ -3,15 +3,30 @@ import { auth } from "@/auth";
 import { findProjectForUser, findTasksForProjectRange } from "@/lib/data";
 import { buildTaskReportDocx } from "@/lib/docs/task-report";
 import { prisma } from "@/lib/prisma";
-import { endOfMonth, endOfWeek, format, parseISO, startOfMonth, startOfWeek } from "date-fns";
+import {
+  endOfMonth,
+  endOfWeek,
+  format,
+  isValid,
+  parseISO,
+  startOfMonth,
+  startOfWeek
+} from "date-fns";
 
 function getRange(searchParams: URLSearchParams) {
   const type = searchParams.get("type") ?? "custom";
   const today = new Date();
 
   if (type === "weekly") {
-    const from = startOfWeek(today, { weekStartsOn: 1 });
-    const to = endOfWeek(today, { weekStartsOn: 1 });
+    const week = searchParams.get("week");
+    const selectedDate = week ? parseISO(week) : today;
+
+    if (!isValid(selectedDate)) {
+      throw new Error("week must be a valid date");
+    }
+
+    const from = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const to = endOfWeek(selectedDate, { weekStartsOn: 1 });
     return { from, to };
   }
 

@@ -3,6 +3,7 @@
 
 # next.js
 /.next/
+/.next-invoice-qa/
 /out/
 
 # production
@@ -26,3 +27,6 @@ pnpm-debug.log*
 
 # prisma
 /prisma/dev.db
+
+# invoice QA artifacts (contain private invoice details)
+/tmp/invoices/

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, CalendarRange, FolderKanban, Settings } from "lucide-react";
+import { CalendarDays, CalendarRange, FolderKanban, Receipt, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function getProjectId(pathname: string) {
@@ -17,13 +17,14 @@ function getCurrentYearMonth() {
   return `${year}-${month}`;
 }
 
-export function SidebarNav() {
+export function SidebarNav({ defaultProjectId }: { defaultProjectId: string | null }) {
   const pathname = usePathname();
-  const projectId = getProjectId(pathname);
+  const projectId = getProjectId(pathname) ?? defaultProjectId;
   const currentMonth = getCurrentYearMonth();
 
   const links = [
     { key: "projects", href: "/projects", label: "Projects", icon: FolderKanban },
+    { key: "invoices", href: "/invoices", label: "Invoices", icon: Receipt },
     {
       key: "week",
       href: projectId ? `/projects/${projectId}/week` : "/projects",
@@ -50,6 +51,7 @@ export function SidebarNav() {
         const Icon = item.icon;
         const isActive =
           (item.key === "projects" && pathname === "/projects") ||
+          (item.key === "invoices" && pathname === "/invoices") ||
           (item.key === "week" && pathname.includes("/week")) ||
           (item.key === "month" && pathname.includes("/month")) ||
           (item.key === "settings" && pathname === "/settings");

@@ -44,7 +44,12 @@ export default async function ProjectWeekPage({
   return (
     <section className="space-y-4">
       <div className="sticky top-14 z-20 space-y-3 bg-background/95 pb-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <ProjectTabsNav projectId={project.id} projectName={project.name} active="week" />
+        <ProjectTabsNav
+          projectId={project.id}
+          projectName={project.name}
+          active="week"
+          week={format(range.start, "yyyy-MM-dd")}
+        />
         <CalendarToolbar
           title={`${format(range.start, "dd MMM yyyy")} - ${format(range.end, "dd MMM yyyy")}`}
           prevHref={`/projects/${project.id}/week?week=${format(addWeeks(baseDate, -1), "yyyy-MM-dd")}`}

@@ -21,6 +21,8 @@ model User {
   accounts        Account[]
   sessions        Session[]
   projects        Project[]
+  invoiceTemplates InvoiceTemplate[]
+  invoices        Invoice[]
   defaultProject  Project?        @relation("DefaultProject", fields: [defaultProjectId], references: [id], onDelete: SetNull)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -87,6 +89,35 @@ enum ThemePreference {
   SYSTEM
   LIGHT
   DARK
+}
+
+model InvoiceTemplate {
+  id            String   @id @default(cuid())
+  ownerId       String
+  filename      String
+  document      Bytes
+  fields        Json
+  createdAt     DateTime @default(now())
+  owner         User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, createdAt])
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  ownerId       String
+  requestId     String
+  number        String
+  serviceMonth  String
+  invoiceDate   DateTime @db.Date
+  templateName  String
+  pdf           Bytes
+  createdAt     DateTime @default(now())
+  owner         User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, number])
+  @@unique([ownerId, requestId])
+  @@index([ownerId, createdAt])
 }
 
 enum ViewPreference {

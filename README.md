@@ -315,7 +315,86 @@ npm run build
 npx prisma migrate deploy
 ```
 
-## 10. Notes on future improvements
+## 10. Invoice generation
+
+Open **Invoices** in the sidebar (or `/invoices`). Upload your DOCX template once,
+then choose an invoice number, service month and invoice date and click **Export PDF**.
+
+- The supplied Rough Country layout is recognized without editing the DOCX.
+- Other layouts can use `{{invoice_number}}`, `{{invoice_date}}` and
+  `{{service_period}}`. Put `{{service_period}}` in both the header and description.
+- The service month defaults to the previous month; the invoice date defaults to
+  today in the browser's local timezone. Month lengths and leap years are handled.
+- Number suggestions use `RC-{invoice year}-{highest number + 1}` (at least three
+  digits). The template's number is included, so `RC-2026-002` suggests `RC-2026-003`.
+  A new year starts at `001` unless that year already has invoices. Numbers remain editable.
+- DOCX formatting and all other content are preserved. PDF rendering uses LibreOffice
+  through [Gotenberg](https://gotenberg.dev/docs/convert-with-libreoffice/convert-to-pdf).
+  Install the template's fonts on the converter for exact font matching; the standard
+  image substitutes Liberation Sans for Arial with compatible metrics.
+- Templates and completed PDF files are stored privately in Postgres, scoped to the
+  signed-in user. Replacing a template does not change historical PDFs. History shows
+  the latest 100 generations; re-downloading does not consume an invoice number.
+- Use the trash button in history to permanently delete a record and its saved PDF
+  after confirmation. Downloaded files and the template are kept. Number suggestions
+  are recalculated from the remaining records and template.
+- Failed conversions are not recorded. Duplicate numbers are rejected per user;
+  retries of the same request return the saved PDF.
+
+### Setup
+
+```bash
+npm install
+npx prisma generate
+npx prisma migrate deploy
+docker compose -f compose.invoices.yaml up -d
+```
+
+Development defaults to the local converter at `http://127.0.0.1:3001`.
+For production, deploy the converter on a trusted private service and configure:
+
+```env
+GOTENBERG_URL=https://your-private-converter.example
+# Optional complete Authorization header for an authenticated converter/proxy:
+GOTENBERG_AUTHORIZATION=Bearer your-token
+```
+
+The DOCX (including payment details) is sent to that configured converter. Do not use
+a public demo service. On Vercel the converter must run separately; it cannot run
+inside the Next.js function. Allow up to 120 seconds for the invoice export route.
+Local Docker binds only to `127.0.0.1`. Stop it with
+`docker compose -f compose.invoices.yaml stop` when it is no longer needed.
+
+### Verification
+
+```bash
+npm run test:invoices
+npx tsc --noEmit --incremental false
+npm run build
+# Optional fidelity test using a local copy of the Rough Country template:
+GOTENBERG_URL=http://127.0.0.1:3001 node --import tsx scripts/verify-invoice-template.ts /path/to/template.docx
+```
+
+The fidelity check confirms that only the four intended text fields change and
+all other DOCX package parts stay byte-for-byte identical. It writes reference
+and generated PDFs under ignored `tmp/invoices/` for visual inspection. Templates
+and generated invoices containing personal or bank details must not be committed.
+
+For the authenticated HTTP smoke test, run a separate verification build (so an
+existing development server cannot overwrite its output):
+
+```bash
+NEXT_DIST_DIR=.next-invoice-qa npm run build
+AUTH_TRUST_HOST=true NEXT_DIST_DIR=.next-invoice-qa GOTENBERG_URL=http://127.0.0.1:3001 npm start -- --port 3100 --hostname 127.0.0.1
+# In another terminal, explicitly allow temporary records in the configured database:
+INVOICE_TEST_ALLOW_DB_WRITES=1 node --env-file=.env --import tsx scripts/verify-invoice-api.ts /path/to/template.docx
+```
+
+This verifies real uploads, exports, retries, duplicate rejection, re-downloads,
+authentication and cross-user isolation. It removes its two temporary users and
+their cascading records in a `finally` block. Use a test database when available.
+
+## 11. Notes on future improvements
 
 - Add optimistic ordering within a day with persisted drag-sort indexes.
 - Add filtering by project tags/labels.
